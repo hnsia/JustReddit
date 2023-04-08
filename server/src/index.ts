@@ -11,6 +11,7 @@ import { createClient } from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
+import cors from "cors";
 
 const main = async () => {
   const orm = await MikroORM.init(microConfig);
@@ -23,6 +24,17 @@ const main = async () => {
   const redisClient = createClient({ legacyMode: true });
   await redisClient.connect();
 
+  app.use(
+    cors({
+      origin: [
+        "http://localhost:4000",
+        "http://localhost:3000",
+        "https://studio.apollographql.com",
+      ],
+      credentials: true,
+    })
+  );
+
   app.set("trust proxy", !__prod__);
   app.set("Access-Control-Allow-Origin", "https://studio.apollographql.com");
   app.set("Access-Control-Allow-Credentials", true);
@@ -33,8 +45,8 @@ const main = async () => {
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
-        sameSite: "none", // csrf, set to lax when from frontend, and none when from apollo sandbox
-        secure: true, // cookie only works in https
+        sameSite: "lax", // csrf, set to lax when from frontend, and none when from apollo sandbox
+        secure: __prod__, // cookie only works in https
       },
       saveUninitialized: false,
       secret: "dsfgslgjlsdgjilgdg",
@@ -53,10 +65,15 @@ const main = async () => {
   await apolloServer.start();
   apolloServer.applyMiddleware({
     app,
-    cors: {
-      origin: ["http://localhost:4000", "https://studio.apollographql.com"],
-      credentials: true,
-    },
+    cors: false,
+    // cors: {
+    //   origin: [
+    //     "http://localhost:4000",
+    //     "http://localhost:3000",
+    //     "https://studio.apollographql.com",
+    //   ],
+    //   credentials: true,
+    // },
   });
 
   app.listen(4000, () => {
