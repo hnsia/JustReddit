@@ -18,10 +18,10 @@ export const InputField: React.FC<InputFieldProps> = ({
   size: _,
   ...props
 }) => {
-  const [field, { error, touched }] = useField(props);
+  const [field, { error }] = useField(props);
 
   return (
-    <FormControl isInvalid={error && touched}>
+    <FormControl isInvalid={!!error}>
       <FormLabel htmlFor={field.name}>{label}</FormLabel>
       <Input {...field} {...props} id={field.name} />
       {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
