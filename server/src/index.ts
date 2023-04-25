@@ -7,7 +7,7 @@ import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
-import { createClient } from "redis";
+import Redis from "ioredis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
@@ -21,8 +21,9 @@ const main = async () => {
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redisClient = createClient({ legacyMode: true });
-  await redisClient.connect();
+  // const redisClient = createClient({ legacyMode: true });
+  // await redisClient.connect();
+  const redisClient = new Redis();
 
   app.use(
     cors({
@@ -59,7 +60,12 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ em: emFork, req, res }),
+    context: ({ req, res }): MyContext => ({
+      em: emFork,
+      req,
+      res,
+      redis: redisClient,
+    }),
   });
 
   await apolloServer.start();
