@@ -1,6 +1,5 @@
-import { MikroORM } from "@mikro-orm/core";
+import "reflect-metadata";
 import { COOKIE_NAME, __prod__ } from "./constants";
-import microConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
@@ -12,11 +11,28 @@ import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
 import cors from "cors";
+import { DataSource } from "typeorm";
+import { Post } from "./entities/Post";
+import { User } from "./entities/User";
 
 const main = async () => {
-  const orm = await MikroORM.init(microConfig);
-  await orm.getMigrator().up();
-  const emFork = orm.em.fork();
+  const AppDataSource = new DataSource({
+    type: "postgres",
+    host: "localhost",
+    port: 5432,
+    username: "postgres",
+    password: "postgres",
+    database: "justreddit_torm",
+    synchronize: true, // auto sync migrations without needing to do it manually, convenient for development mode
+    logging: true,
+    entities: [Post, User],
+  });
+
+  AppDataSource.initialize()
+    .then(() => {
+      // here you can start to work with your database
+    })
+    .catch((error) => console.log(error));
 
   const app = express();
 
@@ -61,10 +77,10 @@ const main = async () => {
       validate: false,
     }),
     context: ({ req, res }): MyContext => ({
-      em: emFork,
       req,
       res,
       redis: redisClient,
+      dataSource: AppDataSource,
     }),
   });
 
