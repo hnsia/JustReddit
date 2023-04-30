@@ -24,8 +24,12 @@ export const Login: FC<{}> = () => {
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
-            // successfully registered
-            router.push("/");
+            // successfully login
+            if (typeof router.query.next === "string") {
+              router.push(router.query.next);
+            } else {
+              router.push("/");
+            }
           }
         }}
       >
