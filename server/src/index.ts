@@ -14,6 +14,7 @@ import cors from "cors";
 import { DataSource } from "typeorm";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
+import path from "path";
 
 const main = async () => {
   const AppDataSource = new DataSource({
@@ -25,14 +26,16 @@ const main = async () => {
     database: "justreddit_torm",
     synchronize: true, // auto sync migrations without needing to do it manually, convenient for development mode
     logging: true,
+    migrations: [path.join(__dirname, "./migrations/*")],
     entities: [Post, User],
   });
 
-  AppDataSource.initialize()
+  await AppDataSource.initialize()
     .then(() => {
       // here you can start to work with your database
     })
     .catch((error) => console.log(error));
+  await AppDataSource.runMigrations();
 
   const app = express();
 
