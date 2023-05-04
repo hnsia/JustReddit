@@ -15,6 +15,7 @@ import {
   ObjectType,
 } from "type-graphql";
 import { isAuth } from "../middleware/isAuth";
+import { Upvote } from "../entities/Upvote";
 
 @InputType()
 class PostInput {
@@ -43,7 +44,7 @@ export class PostResolver {
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth) // Only allow user to upvote if user is logged in
-  vote(
+  async vote(
     @Arg("postId", () => Int) postId: number,
     @Arg("value", () => Int) value: number,
     @Ctx() { req, dataSource }: MyContext
@@ -51,19 +52,40 @@ export class PostResolver {
     const isUpvote = value >= 0;
     const realValue = isUpvote ? 1 : -1;
     const { userId } = req.session;
+    console.log(req.session);
 
-    dataSource.query(`
-      START TRANSACTION;
+    const upvote = await Upvote.findOne({ where: { userId, postId } });
 
-      insert into upvote ("userId", "postId", value)
-      values (${userId}, ${postId}, ${realValue});
+    // user has voted on the post before but are changing their vote
+    if (upvote && upvote.value !== realValue) {
+      await dataSource.transaction(async (tm) => {
+        await tm.query(`
+          update upvote 
+          set value = ${realValue}
+          where "postId" = ${postId} and "userId" = ${userId}
+        `);
 
-      update post
-      set points = points + ${realValue}
-      where id = ${postId};
+        await tm.query(`
+          update post
+          set points = points + ${2 * realValue}
+          where id = ${postId}
+        `);
+      });
+    } else if (!upvote) {
+      // User has not voted on the post before
+      await dataSource.transaction(async (tm) => {
+        await tm.query(`
+          insert into upvote ("userId", "postId", value)
+          values (${userId}, ${postId}, ${realValue})
+        `);
 
-      COMMIT;
-    `);
+        await tm.query(`
+          update post
+          set points = points + ${realValue}
+          where id = ${postId}
+        `);
+      });
+    }
 
     return true;
   }
@@ -72,14 +94,18 @@ export class PostResolver {
   async posts(
     @Arg("limit", () => Int) limit: number,
     @Arg("cursor", () => String, { nullable: true }) cursor: string | null,
-    @Ctx() { dataSource }: MyContext
+    @Ctx() { req, dataSource }: MyContext
   ): Promise<PaginatedPosts> {
     const realLimit = Math.min(50, limit);
     const realLimitPlusOne = realLimit + 1;
+    const userId = req.session.userId ? req.session.userId : null;
+
     const qb = dataSource
       .getRepository(Post)
       .createQueryBuilder("post")
       .innerJoinAndSelect("post.creator", "user", 'user.id = post."creatorId"')
+      .leftJoin("post.upvotes", "upvote", `upvote."userId" = ${userId}`)
+      .addSelect("upvote.value", "post_voteStatus")
       .orderBy("post.createdAt", "DESC")
       .take(realLimitPlusOne);
 

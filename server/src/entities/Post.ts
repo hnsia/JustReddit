@@ -1,5 +1,5 @@
 // import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
-import { ObjectType, Field } from "type-graphql";
+import { ObjectType, Field, Int } from "type-graphql";
 import {
   Entity,
   Column,
@@ -31,6 +31,17 @@ export class Post extends BaseEntity {
   @Field()
   @Column({ type: "int", default: 0 })
   points!: number;
+
+  // Workaround for virtual columns, refer to: https://pietrzakadrian.com/blog/virtual-column-solutions-for-typeorm
+  @Field(() => Int, { nullable: true })
+  @Column({
+    type: "int",
+    select: false,
+    nullable: true,
+    insert: false,
+    update: false,
+  })
+  voteStatus: number | null; // 1 or -1 or null
 
   @Field()
   @Column()
