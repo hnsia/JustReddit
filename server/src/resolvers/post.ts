@@ -41,6 +41,33 @@ export class PostResolver {
     return root.text.slice(0, 50);
   }
 
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth) // Only allow user to upvote if user is logged in
+  vote(
+    @Arg("postId", () => Int) postId: number,
+    @Arg("value", () => Int) value: number,
+    @Ctx() { req, dataSource }: MyContext
+  ) {
+    const isUpvote = value >= 0;
+    const realValue = isUpvote ? 1 : -1;
+    const { userId } = req.session;
+
+    dataSource.query(`
+      START TRANSACTION;
+
+      insert into upvote ("userId", "postId", value)
+      values (${userId}, ${postId}, ${realValue});
+
+      update post
+      set points = points + ${realValue}
+      where id = ${postId};
+
+      COMMIT;
+    `);
+
+    return true;
+  }
+
   @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,

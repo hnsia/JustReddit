@@ -15,6 +15,7 @@ import { DataSource } from "typeorm";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 import path from "path";
+import { Upvote } from "./entities/Upvote";
 
 const main = async () => {
   const AppDataSource = new DataSource({
@@ -27,7 +28,7 @@ const main = async () => {
     synchronize: true, // auto sync migrations without needing to do it manually, convenient for development mode
     logging: true,
     migrations: [path.join(__dirname, "./migrations/*")],
-    entities: [Post, User],
+    entities: [Post, User, Upvote],
   });
 
   await AppDataSource.initialize()
