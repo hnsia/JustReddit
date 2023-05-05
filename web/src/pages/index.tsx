@@ -32,13 +32,6 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex align="flex-end">
-        <Heading>JustReddit</Heading>
-        <Link ml="auto" as={NextLink} href="/create-post">
-          Create posts
-        </Link>
-      </Flex>
-      <br></br>
       {!data ? (
         <div>Loading...</div>
       ) : (
@@ -47,7 +40,9 @@ const Index = () => {
             <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
               <UpvoteSection post={p} />
               <Box>
-                <Heading fontSize="xl">{p.title}</Heading>
+                <Link as={NextLink} href={`/post/${p.id}`}>
+                  <Heading fontSize="xl">{p.title}</Heading>
+                </Link>
                 <Text>posted by {p.creator.username}</Text>
                 <Text mt={4}>{p.textSnippet}</Text>
                 <Text>......</Text>
