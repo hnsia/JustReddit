@@ -1,9 +1,10 @@
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Flex, Heading } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import React from "react";
 import { Layout } from "../../components/Layout";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 import { useGetPostFromUrl } from "../../utils/useGetPostFromUrl";
+import { EditDeletePostButtons } from "../../components/EditDeletePostButtons";
 
 const Post: React.FC = ({}) => {
   const [{ data, error, fetching }] = useGetPostFromUrl();
@@ -32,7 +33,15 @@ const Post: React.FC = ({}) => {
 
   return (
     <Layout>
-      <Heading mb={4}>{data?.post?.title}</Heading>
+      <Flex>
+        <Heading mb={4}>{data.post.title}</Heading>
+        <Box ml="auto">
+          <EditDeletePostButtons
+            id={data.post.id}
+            creatorId={data.post.creator.id}
+          />
+        </Box>
+      </Flex>
       {data?.post?.text}
     </Layout>
   );
