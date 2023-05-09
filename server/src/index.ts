@@ -17,6 +17,7 @@ import { User } from "./entities/User";
 import path from "path";
 import { Upvote } from "./entities/Upvote";
 import { createUserLoader } from "./utils/createUserLoader";
+import { createUpvoteLoader } from "./utils/createUpvoteLoader";
 
 const main = async () => {
   const AppDataSource = new DataSource({
@@ -87,6 +88,7 @@ const main = async () => {
       redis: redisClient,
       dataSource: AppDataSource,
       userLoader: createUserLoader(),
+      upvoteLoader: createUpvoteLoader(),
     }),
   });
 

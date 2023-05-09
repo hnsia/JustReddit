@@ -33,15 +33,15 @@ export class Post extends BaseEntity {
   points!: number;
 
   // Workaround for virtual columns, refer to: https://pietrzakadrian.com/blog/virtual-column-solutions-for-typeorm
-  @Field(() => Int, { nullable: true })
-  @Column({
-    type: "int",
-    select: false,
-    nullable: true,
-    insert: false,
-    update: false,
-  })
-  voteStatus: number | null; // 1 or -1 or null
+  // @Field(() => Int, { nullable: true })
+  // @Column({
+  //   type: "int",
+  //   select: false,
+  //   nullable: true,
+  //   insert: false,
+  //   update: false,
+  // })
+  // voteStatus: number | null; // 1 or -1 or null
 
   @Field()
   @Column()
