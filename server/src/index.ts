@@ -43,7 +43,10 @@ const main = async () => {
   );
 
   app.set("trust proxy", !__prod__);
-  app.set("Access-Control-Allow-Origin", "https://studio.apollographql.com");
+  app.set("Access-Control-Allow-Origin", [
+    "https://studio.apollographql.com",
+    process.env.CORS_ORIGIN,
+  ]);
   app.set("Access-Control-Allow-Credentials", true);
   app.use(
     session({
