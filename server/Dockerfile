@@ -12,6 +12,8 @@ RUN yarn
 
 # Bundle app source
 COPY . .
+# Uncomment only if your hosting platform injects other env variables for you except certain ones you need to manually add
+# COPY .env.production .env
 
 RUN yarn build
 

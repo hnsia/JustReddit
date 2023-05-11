@@ -1,4 +1,6 @@
 import "reflect-metadata";
+import "dotenv-safe/config";
+import { AppDataSource } from "./app-data-source";
 import { COOKIE_NAME, __prod__ } from "./constants";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
@@ -11,28 +13,10 @@ import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
 import cors from "cors";
-import { DataSource } from "typeorm";
-import { Post } from "./entities/Post";
-import { User } from "./entities/User";
-import path from "path";
-import { Upvote } from "./entities/Upvote";
 import { createUserLoader } from "./utils/createUserLoader";
 import { createUpvoteLoader } from "./utils/createUpvoteLoader";
 
 const main = async () => {
-  const AppDataSource = new DataSource({
-    type: "postgres",
-    host: "localhost",
-    port: 5432,
-    username: "postgres",
-    password: "postgres",
-    database: "justreddit_torm",
-    synchronize: true, // auto sync migrations without needing to do it manually, convenient for development mode
-    logging: true,
-    migrations: [path.join(__dirname, "./migrations/*")],
-    entities: [Post, User, Upvote],
-  });
-
   await AppDataSource.initialize()
     .then(() => {
       // here you can start to work with your database
@@ -45,13 +29,13 @@ const main = async () => {
   const RedisStore = connectRedis(session);
   // const redisClient = createClient({ legacyMode: true });
   // await redisClient.connect();
-  const redisClient = new Redis();
+  const redisClient = new Redis(process.env.REDIS_URL);
 
   app.use(
     cors({
       origin: [
-        "http://localhost:4000",
-        "http://localhost:3000",
+        `http://localhost:${process.env.PORT}`,
+        process.env.CORS_ORIGIN,
         "https://studio.apollographql.com",
       ],
       credentials: true,
@@ -72,7 +56,7 @@ const main = async () => {
         secure: __prod__, // cookie only works in https
       },
       saveUninitialized: false,
-      secret: "dsfgslgjlsdgjilgdg",
+      secret: process.env.SESSION_SECRET,
       resave: false,
     })
   );
@@ -106,8 +90,8 @@ const main = async () => {
     // },
   });
 
-  app.listen(4000, () => {
-    console.log("server started on localhost:4000");
+  app.listen(parseInt(process.env.PORT), () => {
+    console.log(`server started on localhost:${process.env.PORT}`);
   });
 };
 
