@@ -55,7 +55,7 @@ const main = async () => {
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
-        sameSite: "lax", // csrf, set to lax when from frontend, and none when from apollo sandbox
+        sameSite: __prod__ ? "none" : "lax", // csrf, set to lax when from frontend, and none when from apollo sandbox
         secure: __prod__, // cookie only works in https
       },
       saveUninitialized: false,
