@@ -10,7 +10,7 @@ import { __prod__ } from "./constants";
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL,
-  synchronize: !__prod__, // auto sync migrations without needing to do it manually, convenient for development mode
+  synchronize: false, // auto sync migrations without needing to do it manually, convenient for development mode, set to false for fresh db or production
   logging: true,
   migrations: [path.join(__dirname, "./migrations/*")],
   entities: [Post, User, Upvote],
