@@ -82,7 +82,6 @@ const main = async () => {
   await apolloServer.start();
   apolloServer.applyMiddleware({
     app,
-    cors: false,
     // cors: {
     //   origin: [
     //     "http://localhost:4000",
