@@ -42,7 +42,7 @@ const main = async () => {
     })
   );
 
-  app.set("trust proxy", !__prod__);
+  app.set("trust proxy", 1);
   app.set("Access-Control-Allow-Origin", [
     "https://studio.apollographql.com",
     process.env.CORS_ORIGIN,
