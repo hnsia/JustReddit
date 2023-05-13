@@ -30,7 +30,7 @@ const main = async () => {
   // const redisClient = createClient({ legacyMode: true });
   // await redisClient.connect();
   const redisClient = new Redis(process.env.REDIS_URL);
-  console.log(process.env.CORS_ORIGIN);
+
   app.use(
     cors({
       origin: [
@@ -82,14 +82,14 @@ const main = async () => {
   await apolloServer.start();
   apolloServer.applyMiddleware({
     app,
-    // cors: {
-    //   origin: [
-    //     "http://localhost:4000",
-    //     "http://localhost:3000",
-    //     "https://studio.apollographql.com",
-    //   ],
-    //   credentials: true,
-    // },
+    cors: {
+      origin: [
+        `http://localhost:${process.env.PORT}`,
+        process.env.CORS_ORIGIN,
+        "https://studio.apollographql.com",
+      ],
+      credentials: true,
+    },
   });
 
   app.listen(parseInt(process.env.PORT), () => {
