@@ -1,6 +1,6 @@
 # JustReddit
 
-This is basic just-like-reddit app for me to explore some tech stacks.
+This is a basic "just-like-reddit" app for me to explore some tech stacks.
 
 ## Tech Stack
 
