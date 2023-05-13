@@ -30,7 +30,7 @@ const main = async () => {
   // const redisClient = createClient({ legacyMode: true });
   // await redisClient.connect();
   const redisClient = new Redis(process.env.REDIS_URL);
-
+  console.log(process.env.CORS_ORIGIN);
   app.use(
     cors({
       origin: [
