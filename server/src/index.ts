@@ -22,7 +22,7 @@ const main = async () => {
       // here you can start to work with your database
     })
     .catch((error) => console.log(error));
-  await AppDataSource.runMigrations();
+  // await AppDataSource.runMigrations();
 
   const app = express();
 

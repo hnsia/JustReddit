@@ -19,7 +19,7 @@ interface registerProps {
 
 export const Register: FC<registerProps> = () => {
   const router = useRouter();
-  const [, register] = useRegisterMutation();
+  const [register] = useRegisterMutation();
 
   return (
     <Wrapper variant="small">
@@ -27,7 +27,7 @@ export const Register: FC<registerProps> = () => {
         initialValues={{ email: "", username: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
           console.log(values);
-          const response = await register({ options: values });
+          const response = await register({ variables: { options: values } });
           if (response.data?.register.errors) {
             setErrors(toErrorMap(response.data.register.errors));
           } else if (response.data?.register.user) {
@@ -69,4 +69,4 @@ export const Register: FC<registerProps> = () => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(Register);
+export default Register;

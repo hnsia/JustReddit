@@ -13,9 +13,9 @@ import { useGetPostId } from "../../../utils/useGetPostId";
 export const EditPost: React.FC = ({}) => {
   const router = useRouter();
   const postId = useGetPostId();
-  const [{ data, fetching }] = useGetPostFromUrl();
-  const [, updatePost] = useUpdatePostMutation();
-  if (fetching) {
+  const { data, loading } = useGetPostFromUrl();
+  const [updatePost] = useUpdatePostMutation();
+  if (loading) {
     return (
       <Layout>
         <Box>Loading...</Box>
@@ -37,7 +37,7 @@ export const EditPost: React.FC = ({}) => {
         initialValues={{ title: data.post.title, text: data.post.text }}
         onSubmit={async (values) => {
           console.log(values);
-          await updatePost({ id: postId, ...values });
+          await updatePost({ variables: { id: postId, ...values } });
           router.push("/");
         }}
       >
@@ -71,4 +71,4 @@ export const EditPost: React.FC = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(EditPost);
+export default EditPost;

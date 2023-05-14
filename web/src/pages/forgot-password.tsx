@@ -10,7 +10,7 @@ import NextLink from "next/link";
 
 const ForgotPassword: React.FC<{}> = ({}) => {
   const [complete, setComplete] = useState(false);
-  const [, forgotPassword] = useForgotPasswordMutation();
+  const [forgotPassword] = useForgotPasswordMutation();
 
   return (
     <Wrapper variant="small">
@@ -18,7 +18,7 @@ const ForgotPassword: React.FC<{}> = ({}) => {
         initialValues={{ email: "" }}
         onSubmit={async (values) => {
           console.log(values);
-          await forgotPassword(values);
+          await forgotPassword({ variables: values });
           setComplete(true);
         }}
       >
@@ -59,4 +59,4 @@ const ForgotPassword: React.FC<{}> = ({}) => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(ForgotPassword);
+export default ForgotPassword;
