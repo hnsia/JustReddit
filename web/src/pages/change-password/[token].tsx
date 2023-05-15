@@ -6,7 +6,11 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { InputField } from "../../components/InputField";
 import { Wrapper } from "../../components/Wrapper";
-import { useChangePasswordMutation } from "../../generated/graphql";
+import {
+  MeDocument,
+  MeQuery,
+  useChangePasswordMutation,
+} from "../../generated/graphql";
 import { toErrorMap } from "../../utils/toErrorMap";
 import { withApollo } from "../../utils/withApollo";
 
@@ -27,6 +31,15 @@ const ChangePassword: NextPage<unknown> = () => {
                 typeof router.query.token === "string"
                   ? router.query.token
                   : "",
+            },
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  __typename: "Query",
+                  me: data?.changePassword.user,
+                },
+              });
             },
           });
           if (response.data?.changePassword.errors) {
