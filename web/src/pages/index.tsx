@@ -7,14 +7,12 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
-import { useState } from "react";
 import { EditDeletePostButtons } from "../components/EditDeletePostButtons";
 import { Layout } from "../components/Layout";
 import { UpvoteSection } from "../components/UpvoteSection";
 import { usePostsQuery } from "../generated/graphql";
-import { createUrqlClient } from "../utils/createUrqlClient";
+import { withApollo } from "../utils/withApollo";
 
 const Index = () => {
   const { data, error, loading, fetchMore, variables } = usePostsQuery({
@@ -101,4 +99,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default withApollo({ ssr: true })(Index);
